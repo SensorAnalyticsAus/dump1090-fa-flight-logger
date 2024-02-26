@@ -21,7 +21,7 @@ case $1 in
      if pgrep -f "python ./$PROGNM"  > /dev/null 2>&1; then
         echo "[$TS] $PROGNM is already running"
      else
-        /usr/bin/screen -S $SCRNM -dm python ./$PROGNM
+        /usr/bin/screen -h 500  -S $SCRNM -dm python ./$PROGNM
         if [ $? = 0 ] ; then 
            echo "[$TS] $PROGNM started"
         else
@@ -58,7 +58,7 @@ case $1 in
      if pgrep -f "python ./$PROGNM"  > /dev/null 2>&1; then
         echo "[$TS] $PROGNM is already running"
      else
-        /usr/bin/screen -S $SCRNM -dm python ./$PROGNM
+        /usr/bin/screen -h 500 -S $SCRNM -dm python ./$PROGNM
         if [ $? = 0 ] ; then 
            echo "[$TS] $PROGNM started"
         else
@@ -66,6 +66,6 @@ case $1 in
         fi
      fi;;
   *)
-     echo "usage: tapo1 start|stop|restart"
+     echo "usage: ctrl-flt start|stop|restart"
      exit 1;;
 esac

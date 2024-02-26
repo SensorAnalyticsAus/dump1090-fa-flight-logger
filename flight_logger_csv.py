@@ -104,7 +104,7 @@ while True:
      # create headers if first time writing to file
      if not file_exists: writer.writeheader()
 
-# Flight specified andd flight is not in csv (new entry)
+# Flight specified and flight is not in csv (new entry)
  for entry in json_dump['aircraft']:
      if('flight' in entry and 
          ('{},{}'.format(entry['flight'].strip(), today) not in flights)

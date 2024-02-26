@@ -4,4 +4,4 @@
 
 Never miss a flight including returns :)
 
-*Credit to https://github.com/CactusProjects/flightlogger and /u/gl0ckner/ on Reddit*
+*Credit to https://github.com/CactusProjects/flightlogger and [/u/gl0ckner/](https://www.reddit.com/user/gl0ckner/) on Reddit*

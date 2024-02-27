@@ -14,6 +14,11 @@ import json
 import sys, signal
 import csv
 
+def getSq(ent):
+ if ent.get('squawk') is not None: 
+     sq=ent['squawk']
+ else: sq='-'
+ return sq
 def getAl(ent):
  if ent.get('alt_baro') is not None: 
      al=ent['alt_baro']
@@ -25,13 +30,14 @@ def getAl(ent):
      al=ent['nav_altitude_fms']
  else: al='-'
  return al
-def cUpdt(hval,fval,dt,ti,at,stat):
+def cUpdt(hval,fval,dt,ti,at,sq,stat):
  with open(filepath, 'a', newline='') as file:
      writer = csv.writer(file)
-     fieldnames = ['hex','flight','date','time','alt','s']
+     fieldnames = ['hex','flight','date','time','alt','sq','s']
      writer = csv.DictWriter(file, fieldnames=fieldnames)
      writer.writerow(
-      {'hex':hval,'flight':fval,'date':dt,'time':ti,'alt':at,'s':stat})
+      {'hex':hval,'flight':fval,'date':dt,'time':ti,'alt':at,
+       'sq':sq,'s':stat})
 def getJ():
  with open('/run/dump1090-fa/aircraft.json', 'r') as aircraft:
      file_contents = aircraft.read()
@@ -99,7 +105,8 @@ while True:
  # write unique flights for the day to csv file
  with open(filepath, 'a', newline='') as file:
      writer = csv.writer(file)
-     fieldnames = ['ICAO','flight', 'date', 'time','altitude', 'status']
+     fieldnames = ['ICAO','flight', 'date', 'time','altitude', 
+                   'squawk', 'status']
      writer = csv.DictWriter(file, fieldnames=fieldnames)
      # create headers if first time writing to file
      if not file_exists: writer.writeheader()
@@ -112,29 +119,33 @@ while True:
          hv=entry['hex'].strip()
          fv=entry['flight'].strip()
          al=getAl(entry)
-         cUpdt(hv,fv,today,time,al,'N')
-         print('N:',hv,fv,'at:',al,today,time)
+         sq=getSq(entry)
+         cUpdt(hv,fv,today,time,al,sq,'N')
+         print('N:',hv,fv,sq,'at:',al,today,time)
 # Flight n/a but ICAO hex code specified, code is not in csv (new entry)
      elif('hex' in entry and 
          '{},{},{}'.format(entry['hex'].strip(),'-',today) not in flights
          ):
          hv=entry['hex'].strip()
          al=getAl(entry)
-         cUpdt(hv,'-',today,time,al,'N')
-         print('N:',hv,'at:',al,today,time)
+         sq=getSq(entry)
+         cUpdt(hv,'-',today,time,al,sq,'N')
+         print('N:',hv,'-',sq,'at:',al,today,time)
 # This flight is in csv but it is outside  FWIN window (Return flight)
      elif 'flight' in entry and (tm()-getTS(cf,entry['flight'].strip())) > FWIN:
          hv=entry['hex'].strip()
          fv=entry['flight'].strip()
          otime=getTS(cf,fv) #note original ts before csv is updated
          al=getAl(entry)
-         cUpdt(hv,fv,today,time,al,'R')
-         print('R:',hv,fv,'at',al,TSdate(otime),TSdate(tm()))
+         sq=getSq(entry)
+         cUpdt(hv,fv,today,time,al,sq,'R')
+         print('R:',hv,fv,sq,'at',al,TSdate(otime),TSdate(tm()))
 # This flight only has a ICAO code in csv and it is outside FWIN (Return flight)
      elif 'hex' in entry and (tm()-getTS(cf,entry['hex'].strip())) > FWIN:
          hv=entry['hex'].strip()
          otime=getTS(cf,hv) #note original ts before csv is updated
          al=getAl(entry)
-         cUpdt(hv,'-',today,time,al,'R')
-         print('R:',hv,'at',al,TSdate(otime),TSdate(tm()))
+         sq=getSq(entry)
+         cUpdt(hv,'-',today,time,al,sq,'R')
+         print('R:',hv,'-',sq,'at',al,TSdate(otime),TSdate(tm()))
  sleep(SWIN) # sleep SWIN secs before starting next while iter 
